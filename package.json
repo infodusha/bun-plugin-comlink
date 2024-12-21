@@ -1,0 +1,33 @@
+{
+  "name": "bun-plugin-comlink",
+  "version": "0.0.1",
+  "module": "index.ts",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/infodusha/bun-plugin-comlink.git"
+  },
+  "keywords": [
+    "bun",
+    "plugin",
+    "comlink",
+    "worker"
+  ],
+  "author": "infodusha",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/infodusha/bun-plugin-comlink/issues"
+  },
+  "homepage": "https://github.com/infodusha/bun-plugin-comlink#readme",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "~5.7.2",
+    "comlink": "^4.4.2"
+  },
+  "dependencies": {
+    "acorn": "^8.14.0",
+    "acorn-walk": "^8.3.4"
+  }
+}

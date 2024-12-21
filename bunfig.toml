@@ -1,0 +1,4 @@
+preload = ["./plugin.ts"]
+
+[install]
+saveTextLockfile = true
