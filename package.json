@@ -1,6 +1,6 @@
 {
   "name": "bun-plugin-comlink",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "module": "index.ts",
   "type": "module",
   "repository": {

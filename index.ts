@@ -6,7 +6,7 @@ export default function comlinkPlugin(): BunPlugin {
     async setup(build) {
       const loaderScript = await file("./loader.ts").text();
 
-      build.onLoad({ filter: /\.worker.ts$/ }, async ({ path }) => {
+      build.onLoad({ filter: /\.worker.(j|t)s$/ }, async ({ path }) => {
         const worker = await file(path).text();
         const exportNames = await getExportNames(worker);
         const exportCode = exportNames
@@ -39,23 +39,32 @@ async function getExportNames(code: string) {
       switch (node.declaration?.type) {
         case "FunctionDeclaration":
           if (!node.declaration.async) {
-            throw new Error("You can't have sync functions with comlink");
+            throw new Error("You can't have sync functions in worker");
           }
           names.push(node.declaration.id.name);
           break;
         case "VariableDeclaration":
-          const [name] = node.declaration.declarations
-            .filter((d) => d.type === "VariableDeclarator")
-            .map((d) => (d.id.type === "Identifier" ? d.id.name : null))
-            .filter(Boolean);
-          // TODO check if async
+          const variableDeclarator = node.declaration.declarations.find(
+            (d) => d.type === "VariableDeclarator"
+          );
+          if (!variableDeclarator) {
+            throw new Error("You can't have an anonymous export");
+          }
+          const name =
+            variableDeclarator.id.type === "Identifier"
+              ? variableDeclarator.id.name
+              : null;
           if (!name) {
             throw new Error("You can't have an anonymous export");
           }
+          if (variableDeclarator.init?.type !== "ArrowFunctionExpression") {
+            throw new Error("You can export only functions from worker");
+          }
+          if (!variableDeclarator.init.async) {
+            throw new Error("You can't have sync functions in worker");
+          }
           names.push(name);
           break;
-        default:
-          throw new Error("Unknown export type");
       }
     },
   });
