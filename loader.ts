@@ -13,5 +13,11 @@ const blob = new Blob(
 
 const url = URL.createObjectURL(blob);
 const worker = new Worker(url);
-worker.addEventListener("error", ({ message }) => console.error(message));
+worker.unref();
+const { promise, resolve, reject } = Promise.withResolvers();
+worker.addEventListener("open", resolve);
+worker.addEventListener("error", ({ message }) => reject(message));
+
 const api = wrap(worker);
+
+await promise;
