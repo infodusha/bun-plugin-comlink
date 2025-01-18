@@ -1,6 +1,6 @@
 {
   "name": "bun-plugin-comlink",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "module": "index.ts",
   "type": "module",
   "repository": {
@@ -12,6 +12,14 @@
     "plugin",
     "comlink",
     "worker"
+  ],
+  "files": [
+    "package.json",
+    "index.ts",
+    "loader.ts",
+    "plugin.ts",
+    "LICENSE",
+    "README.md"
   ],
   "author": "infodusha",
   "license": "Apache-2.0",
