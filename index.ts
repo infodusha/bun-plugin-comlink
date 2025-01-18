@@ -8,13 +8,17 @@ export default function comlinkPlugin(): BunPlugin {
 
       build.onLoad({ filter: /\.worker.(j|t)s$/ }, async ({ path }) => {
         const worker = await file(path).text();
-        const exportNames = await getExportNames(worker);
-        const exportCode = exportNames
+        const [exportNames, hasDefault] = await getExportNames(worker);
+        let exportCode = exportNames
           .map((name) => `export const ${name} = api.${name};`)
           .join("\n");
 
-        const contents =
-          loaderScript.replace("WORKER_PATH", path) + "\n" + exportCode;
+        if (hasDefault) {
+          exportCode += `\nexport default api.default;`;
+        }
+
+        const scriptCode = loaderScript.replace("WORKER_PATH", path);
+        const contents = `${scriptCode}\n${exportCode}`;
         return {
           contents,
           loader: "ts",
@@ -33,8 +37,12 @@ async function getExportNames(code: string) {
   });
 
   const names: string[] = [];
+  let hasDefault = false;
 
   walk.simple(program, {
+    ExportDefaultDeclaration(node) {
+      hasDefault = true;
+    },
     ExportNamedDeclaration(node) {
       switch (node.declaration?.type) {
         case "FunctionDeclaration":
@@ -65,9 +73,18 @@ async function getExportNames(code: string) {
           }
           names.push(name);
           break;
+        case undefined:
+          for (const specifier of node.specifiers) {
+            if (
+              specifier.type === "ExportSpecifier" &&
+              specifier.exported.type === "Identifier"
+            ) {
+              names.push(specifier.exported.name);
+            }
+          }
       }
     },
   });
 
-  return names;
+  return [names, hasDefault] as const;
 }
